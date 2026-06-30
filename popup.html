@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AI Context Bridge</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      width: 380px;
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f0f1a;
+      color: #e0e0e0;
+      padding: 20px;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header-left span { font-size: 22px; }
+
+    .header h1 { font-size: 15px; font-weight: 700; color: #ffffff; }
+    .header p { font-size: 11px; color: #666688; margin-top: 2px; }
+
+    .api-btn {
+      background: #1e1e38;
+      border: 1px solid #333355;
+      color: #a0a0c0;
+      font-size: 11px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      width: auto;
+      margin-bottom: 0;
+    }
+
+    .api-btn:hover { background: #2a2a4a; opacity: 1; }
+
+    .site-box {
+      background: #16213e;
+      border: 1px solid #1e2d50;
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      font-size: 12px;
+      color: #7788aa;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .site-box .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #e94560;
+      flex-shrink: 0;
+    }
+
+    .site-box .dot.green { background: #44cc77; }
+
+    #summarizeBtn {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #e94560, #c0392b);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 14px;
+      transition: opacity 0.2s;
+    }
+
+    #summarizeBtn:hover { opacity: 0.88; }
+    #summarizeBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .loader {
+      text-align: center;
+      font-size: 12px;
+      color: #7788aa;
+      display: none;
+      margin-bottom: 10px;
+      padding: 10px;
+    }
+
+    .loader .spinner {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid #333355;
+      border-top-color: #e94560;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .result-box {
+      background: #16213e;
+      border: 1px solid #1e2d50;
+      border-radius: 8px;
+      padding: 14px;
+      font-size: 12px;
+      line-height: 1.7;
+      color: #c0c0d0;
+      max-height: 220px;
+      overflow-y: auto;
+      display: none;
+      margin-bottom: 12px;
+    }
+
+    .result-box h2 {
+      color: #e94560;
+      font-size: 13px;
+      margin: 10px 0 4px 0;
+    }
+
+    .result-box h2:first-child { margin-top: 0; }
+    .result-box strong { color: #ffffff; }
+    .result-box ul, .result-box ol { padding-left: 16px; margin: 4px 0; }
+    .result-box li { margin: 3px 0; }
+
+    .result-box code {
+      background: #0a1628;
+      color: #7ec8e3;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 11px;
+      font-family: 'Courier New', monospace;
+    }
+
+    #copyBtn {
+      width: 100%;
+      padding: 10px;
+      background: #1e2d50;
+      color: #ffffff;
+      border: 1px solid #2a3d6a;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: none;
+      transition: all 0.2s;
+      margin-bottom: 0;
+    }
+
+    #copyBtn:hover { background: #243560; opacity: 1; }
+
+    #copyBtn.copied {
+      background: #0d3320;
+      border-color: #44cc77;
+      color: #44cc77;
+    }
+
+    .toast {
+      display: none;
+      text-align: center;
+      font-size: 12px;
+      color: #44cc77;
+      margin-top: 10px;
+      padding: 8px;
+      background: #0d3320;
+      border: 1px solid #44cc77;
+      border-radius: 6px;
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+    .footer {
+      text-align: center;
+      margin-top: 14px;
+      font-size: 10px;
+      color: #333355;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="header-left">
+      <span>🔗</span>
+      <div>
+        <h1>AI Context Bridge</h1>
+        <p>Transfer context across AI chats</p>
+      </div>
+    </div>
+    <button class="api-btn" id="apiKeyBtn">⚙️ API Key</button>
+  </div>
+
+  <div class="site-box">
+    <div class="dot" id="statusDot"></div>
+    <span id="siteStatus">Detecting chat platform...</span>
+  </div>
+
+  <button id="summarizeBtn">✨ Summarize Entire Chat</button>
+
+  <div class="loader" id="loader">
+    <span class="spinner"></span> Reading and summarizing full conversation...
+  </div>
+
+  <div class="result-box" id="resultBox"></div>
+
+  <button id="copyBtn">📋 Copy to Clipboard</button>
+
+  <div class="toast" id="toast">✅ Copied! Paste it in your next AI chat.</div>
+
+  <div class="footer">Works on ChatGPT · Claude · Gemini &nbsp;·&nbsp; Powered by Gemini API</div>
+
+  <script src="marked.min.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

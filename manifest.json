@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "AI Context Bridge",
+  "version": "1.0",
+  "description": "Summarize your entire AI chat and copy it to continue in another chatbot",
+  "permissions": ["activeTab", "storage", "scripting", "clipboardWrite"],
+  "host_permissions": [
+    "https://chatgpt.com/*",
+    "https://chat.openai.com/*",
+    "https://claude.ai/*",
+    "https://gemini.google.com/*",
+    "https://generativelanguage.googleapis.com/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "AI Context Bridge"
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
+}
